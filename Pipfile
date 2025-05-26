@@ -1,0 +1,28 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+celery = "*"
+redis = "*"
+psycopg2 = "*"
+pydantic-settings = "*"
+asyncpg = "*"
+fastapi = "*"
+sqlalchemy = "*"
+alembic = "*"
+pydantic = "*"
+pandas = "*"
+openpyxl = "*"
+aiosqlite = "*"
+python-multipart = "*"
+watchfiles = "*"
+uvicorn = "==0.34.2"
+joblib = "*"
+statsmodels = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
