@@ -8,5 +8,5 @@ class Direction(Base):
 
     name = Column(String, unique=True, nullable=False)
 
-    students = relationship("Student", back_populates="direction")
+    students = relationship("Student",back_populates="direction", cascade="all, delete-orphan")
     ml_models = relationship("MLModel", back_populates="direction")

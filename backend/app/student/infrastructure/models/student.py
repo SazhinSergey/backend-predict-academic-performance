@@ -20,6 +20,6 @@ class Student(Base):
 
     predicted_success = Column(Float)
 
-    direction_id = Column(Integer, ForeignKey("directions.id"))
+    direction_id = Column(Integer, ForeignKey("directions.id" , ondelete='CASCADE'), nullable=False)
     direction = relationship(Direction, back_populates="students")
     prediction = relationship(Prediction, back_populates="student")

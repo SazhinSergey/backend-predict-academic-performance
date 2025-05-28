@@ -86,16 +86,8 @@ async def predict_by_ids(
     if not students:
         raise HTTPException(status_code=404, detail="Студенты не найдены")
 
-    direction_ids = {s.direction_id for s in students}
-    if len(direction_ids) != 1:
-        raise HTTPException(
-            status_code=400,
-            detail="Все студенты должны относиться к одному направлению"
-        )
 
-    direction_id = direction_ids.pop()
-
-    predictions = await ml_model_service.predict_for_students(model_id, students, direction_id)
+    predictions = await ml_model_service.predict_for_students(model_id, students)
     return predictions
 
 

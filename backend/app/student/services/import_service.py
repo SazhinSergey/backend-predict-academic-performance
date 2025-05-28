@@ -16,11 +16,11 @@ class StudentImportService:
         self.student_repo = student_repo
         self.direction_repo = direction_repo
 
-    async def import_from_excel(self, file_bytes: bytes, sheet_name: str = "МТМХПМ_итог") -> int:
+    async def import_from_excel(self, file_bytes: bytes, sheet_name: str) -> int:
         df = pd.read_excel(file_bytes, sheet_name=sheet_name)
 
-        required_columns = ["ФИО", "М", "Р", "ЕГЭ", "1_сессия_сдано",
-                            "2_сессия_сдано", "3_сессия_сдано", "4_сессия_сдано"]
+        required_columns = ["ФИО", "балл по Математике", "балл по Русскому", "сумма баллов ЕГЭ",
+        "1 сессия", "2 сессия", "3 сессия", "4 сессия"]
 
         if not all(col in df.columns for col in required_columns):
             missing = [col for col in required_columns if col not in df.columns]
@@ -33,14 +33,14 @@ class StudentImportService:
         students = []
         for _, row in df.iterrows():
             student = BaseStudent(
-                full_name=row["ФИО"],
-                math_score=row["М"],
-                russian_score=row["Р"],
-                ege_score=row["ЕГЭ"],
-                session_1_passed=row["1_сессия_сдано"] == max_session[0],
-                session_2_passed=row["2_сессия_сдано"] == max_session[1],
-                session_3_passed=row["3_сессия_сдано"] == max_session[2],
-                session_4_passed=row["4_сессия_сдано"] == max_session[3],
+                full_name=str(row["ФИО"]),
+                math_score=row["балл по Математике"],
+                russian_score=row["балл по Русскому"],
+                ege_score=row["сумма баллов ЕГЭ"],
+                session_1_passed=row["1 сессия"] == max_session[0],
+                session_2_passed=row["2 сессия"] == max_session[1],
+                session_3_passed=row["3 сессия"] == max_session[2],
+                session_4_passed=row["4 сессия"] == max_session[3],
                 direction_id=direction.id,
             )
             students.append(student)

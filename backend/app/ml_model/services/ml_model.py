@@ -92,7 +92,6 @@ class MLModelService:
             self,
             model_id: id,
             students: list,
-            direction_id: int
     ) -> list[PredictionEntity]:
         if not students:
             return []
@@ -109,10 +108,6 @@ class MLModelService:
         if not model_entity:
             raise ValueError(f"Модель '{model_name}' не найдена в БД")
 
-        if direction_id != model_entity.direction_id:
-            raise ValueError(
-                f"Несовпадение direction_id: в запросе {direction_id}, а в хранилище {model_entity.direction_id}"
-            )
 
         df = pd.DataFrame([
             {**{col: getattr(s, col) for col in feature_columns}, "student_id": s.id}

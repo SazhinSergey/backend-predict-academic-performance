@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import Dict, Any
-from sqlalchemy import TIMESTAMP, func, Integer
+from sqlalchemy import TIMESTAMP, func, Integer, text
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sessionmaker, AsyncAttrs
 from sqlalchemy.orm import DeclarativeBase, declared_attr, Mapped, mapped_column
 from app.db.config import database_url
@@ -14,6 +14,15 @@ engine = create_async_engine(url=database_url,
     )
 async_session_maker = async_sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
+async def enable_sqlite_pragma(conn):
+    if "sqlite" in str(conn.engine.url):
+        await conn.execute(text("PRAGMA foreign_keys=ON;"))
+        await conn.commit()
+
+# Вызываем один раз при старте
+async def init_db():
+    async with engine.begin() as conn:
+        await enable_sqlite_pragma(conn)
 
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True

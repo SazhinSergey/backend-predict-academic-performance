@@ -13,5 +13,5 @@ class MLModel(Base):
     features = Column(JSON, nullable=False)  # Хранение признаков в JSON
 
     prediction = relationship("Prediction", back_populates="ml_models", uselist=False)
-    direction_id = Column(Integer, ForeignKey("directions.id"), nullable=True)
+    direction_id = Column(Integer, ForeignKey("directions.id", ondelete='SET NULL'), nullable=True)
     direction = relationship("Direction", back_populates="ml_models")

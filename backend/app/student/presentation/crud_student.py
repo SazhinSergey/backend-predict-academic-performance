@@ -44,17 +44,22 @@ async def get_filtered_students(
 ):
     return await service.get_filtered_students(filter_student)
 
+
 @router.get("/with_relations")
-async def get_student_with_relations(request: StudentFilterForRelation = Query(None), service: StudentService = Depends(get_student_service)):
+async def get_student_with_relations(request: StudentFilterForRelation = Query(None),
+                                     service: StudentService = Depends(get_student_service)):
     return await service.get_students_with_relations(request.direction_id, request.model_id)
 
 
 @router.get("/without_prediction")
-async def get_student_without_prediction(direction_id: int | None = Query(None), service: StudentService = Depends(get_student_service)):
+async def get_student_without_prediction(direction_id: int | None = Query(None),
+                                         service: StudentService = Depends(get_student_service)):
     return await service.get_student_without_prediction(direction_id)
 
+
 @router.get("/by_filters")
-async def get_student_by_filters(filters: StudentFilterByDirection = Query(), service: StudentService = Depends(get_student_service)):
+async def get_student_by_filters(filters: StudentFilterByDirection = Query(),
+                                 service: StudentService = Depends(get_student_service)):
     return await service.get_filtered_students(filters)
 
 
@@ -84,27 +89,28 @@ async def delete_student(student_id: int, service: StudentService = Depends(get_
 
 
 @router.post("/upload")
-async def upload_student(file: UploadFile = File(...),
-                         sheet_name: str = "МТМХПМ_итог",
-                         service: StudentImportService = Depends(get_student_import_service)):
+async def upload_student(
+        sheet_name: str,
+        file: UploadFile = File(...),
+        service: StudentImportService = Depends(get_student_import_service)):
     if not file.filename.endswith(".xlsx"):
         raise HTTPException(status_code=400, detail="Файл должен быть Excel (.xlsx)")
 
     file_bytes = await file.read()
     try:
         count = await service.import_from_excel(file_bytes, sheet_name=sheet_name)
-        return {"status": "ok", "message": f"{count} студентов загружено"}
+        return {f"{count} студентов загружено"}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
     except Exception:
         raise HTTPException(status_code=500, detail="Ошибка при загрузке файла")
 
 
-@router.get("/template")
+@router.get("/template/")
 async def download_student_template():
     df = pd.DataFrame(columns=[
-        "ФИО", "М", "Р", "ЕГЭ",
-        "1_сессия_сдано", "2_сессия_сдано", "3_сессия_сдано", "4_сессия_сдано"
+        "ФИО", "балл по Математике", "балл по Русскому", "сумма баллов ЕГЭ",
+        "1 сессия", "2 сессия", "3 сессия", "4 сессия"
     ])
     buffer = io.BytesIO()
     with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
@@ -116,6 +122,3 @@ async def download_student_template():
         media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
         headers={"Content-Disposition": "attachment; filename=student_template.xlsx"}
     )
-
-
-
