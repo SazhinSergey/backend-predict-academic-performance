@@ -23,6 +23,11 @@ class ProbabilityAnalysisService:
         min_target_feature = df[target_feature].min()
         count_rows = len(df)
 
+        if max_target_feature == min_target_feature:
+            # Защита от одинаковых значений — создаём один фиктивный интервал
+            df['interval'] = f"{min_target_feature:.1f}-{min_target_feature + 1:.1f}"
+            return df
+
         R = max_target_feature - min_target_feature
         r = int(1 + 3.322 * np.log10(count_rows))
         h = R / r
@@ -47,7 +52,7 @@ class ProbabilityAnalysisService:
         mean_prob = df_with_intervals.groupby('interval', observed=True)['predicted_prob'].mean().fillna(0)
         return mean_prob.to_dict()
 
-    async def get_probability_intervals(self, model_id: int, target_feature: str):
+    async def get_probability_intervals(self, model_id: int, target_feature: str, direction_id: int):
         model = await self.db_repo.get_by_id(model_id)
         if not model:
             raise ValueError(f"Model with id='{model_id}' not found")
@@ -56,7 +61,7 @@ class ProbabilityAnalysisService:
         if target_feature not in feature_columns:
             raise ValueError(f"Feature '{target_feature}' not in model features")
 
-        students = await self.student_repo.list_all()
+        students = await self.student_repo.list_by_direction(direction_id=direction_id)
         predictions = await self.prediction_repo.get_prediction_data_by_model_id(model.id)
 
         students_df = pd.DataFrame([s.__dict__ for s in students])

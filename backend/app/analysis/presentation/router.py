@@ -23,12 +23,13 @@ async def get_probability_intervals(
         request: Request,
         model_id: int,
         target_feature: str = Query(...),
+        direction_id: int = Query(...),
         service: ProbabilityAnalysisService = Depends(get_service),
 ):
 
     #model_data = get_model_from_state(request, model_id)
     try:
-        result = await service.get_probability_intervals(model_id, target_feature)
+        result = await service.get_probability_intervals(model_id, target_feature, direction_id)
         return {"probability_intervals": result}
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))
